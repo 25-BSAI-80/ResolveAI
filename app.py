@@ -55,7 +55,7 @@ st.markdown("""
         background-image: 
             linear-gradient(rgba(36, 67, 107, 0.12) 1px, transparent 1px),
             linear-gradient(90deg, rgba(36, 67, 107, 0.12) 1px, transparent 1px),
-            radial-gradient(circle at 15% 10%, rgba(74, 144, 226, 0.10) 0%, transparent 45%),
+            radial-gradient(circle at 15% 10%, rgba(10, 26, 48, 0.10) 0%, transparent 45%),
             radial-gradient(circle at 85% 90%, rgba(36, 67, 107, 0.15) 0%, transparent 50%),
             linear-gradient(180deg, var(--bg-void) 0%, var(--bg-deep) 100%);
         background-size: 50px 50px, 50px 50px, 100% 100%, 100% 100%, 100% 100%;
@@ -811,15 +811,201 @@ if uploaded_file is not None:
             
             st.info(f"Save this Receipt ID: `{full_receipt_id}`")
             
-            receipt_text = "\\n".join([f"{k}: {v}" for k, v in receipt_data.items()])
+                        # ===== PDF GENERATION =====
+            from fpdf import FPDF
+            
+                        # ===== PDF GENERATION (Challan Style - A5 Portrait) =====
+            from fpdf import FPDF
+            
+            # A5 size in mm: 148 x 210, Portrait
+            pdf = FPDF(orientation='P', unit='mm', format='A5')
+            pdf.add_page()
+            pdf.set_auto_page_break(auto=False, margin=5)
+            
+            # ===== TOP HEADER =====
+            pdf.set_font("Helvetica", "B", 9)
+            pdf.set_text_color(0, 0, 0)
+            pdf.cell(0, 5, "B.E, BS AND BSc ENGINEERING", ln=True, align='C')
+            pdf.cell(0, 5, "TECHNOLOGY", ln=True, align='C')
+            
+            pdf.ln(2)
+            pdf.set_font("Helvetica", "", 7)
+            pdf.set_text_color(80, 80, 80)
+            pdf.cell(0, 4, "STUDENT'S COPY", ln=True, align='C')
+            
+            pdf.ln(3)
+            
+            # ===== BANK INFO =====
+            pdf.set_draw_color(0, 0, 0)
+            pdf.set_line_width(0.3)
+            
+            # Logo circle (placeholder)
+            pdf.set_fill_color(240, 240, 240)
+            pdf.ellipse(10, pdf.get_y(), 12, 12, 'DF')
+            pdf.set_font("Helvetica", "B", 6)
+            pdf.set_xy(10, pdf.get_y() + 5)
+            pdf.cell(12, 3, "NBP", align='C')
+            
+            # Bank details next to logo
+            pdf.set_xy(25, pdf.get_y() - 5)
+            pdf.set_font("Helvetica", "B", 8)
+            pdf.set_text_color(0, 0, 0)
+            pdf.cell(0, 4, "NATIONAL BANK OF PAKISTAN", ln=True)
+            pdf.set_x(25)
+            pdf.set_font("Helvetica", "", 7)
+            pdf.cell(0, 3.5, "Quaid-e-Awam University of Engg.", ln=True)
+            pdf.set_x(25)
+            pdf.cell(0, 3.5, "Science & Technology, Nawabshah", ln=True)
+            
+            pdf.ln(4)
+            
+            # ===== SR NO AND DATE =====
+            y_pos = pdf.get_y()
+            pdf.set_font("Helvetica", "B", 8)
+            
+            # Sr. No.
+            pdf.set_xy(10, y_pos)
+            pdf.cell(15, 5, "Sr. No.")
+            pdf.set_font("Helvetica", "", 9)
+            pdf.set_text_color(200, 0, 0)  # Red like original
+            pdf.cell(20, 5, "126", border='B')
+            
+            # Date
+            pdf.set_xy(60, y_pos)
+            pdf.set_text_color(0, 0, 0)
+            pdf.set_font("Helvetica", "B", 8)
+            pdf.cell(12, 5, "Date:")
+            pdf.set_font("Helvetica", "", 9)
+            pdf.set_text_color(200, 0, 0)
+            pdf.cell(40, 5, str(receipt_data['payment_date']), border='B')
+            
+            pdf.ln(8)
+            pdf.set_text_color(0, 0, 0)
+            
+            # ===== RECEIVE & CREDIT =====
+            pdf.set_font("Helvetica", "B", 8)
+            pdf.cell(0, 5, "Please receive & credit to QUEST", ln=True, align='C')
+            pdf.set_font("Helvetica", "B", 7)
+            pdf.cell(0, 4, "Account No. NIDA-9-1", ln=True, align='C')
+            
+            pdf.ln(3)
+            
+            # ===== STUDENT DETAILS =====
+            pdf.set_font("Helvetica", "B", 8)
+            line_height = 6
+            
+            # Name
+            pdf.cell(30, line_height, "Name")
+            pdf.set_font("Helvetica", "", 9)
+            pdf.cell(0, line_height, str(final_name), border='B', ln=True)
+            
+            # Father's Name
+            pdf.set_font("Helvetica", "B", 8)
+            pdf.cell(30, line_height, "Father's Name")
+            pdf.set_font("Helvetica", "", 9)
+            pdf.cell(0, line_height, str(receipt_data['father_name']), border='B', ln=True)
+            
+            # Cell
+            pdf.set_font("Helvetica", "B", 8)
+            pdf.cell(30, line_height, "Cell #")
+            pdf.set_font("Helvetica", "", 9)
+            pdf.cell(0, line_height, str(receipt_data['cell_number']), border='B', ln=True)
+            
+            # Roll
+            pdf.set_font("Helvetica", "B", 8)
+            pdf.cell(30, line_height, "Roll#")
+            pdf.set_font("Helvetica", "", 9)
+            pdf.cell(0, line_height, str(final_roll), border='B', ln=True)
+            
+            pdf.ln(2)
+            
+            # ===== BATCH INFO =====
+            pdf.set_font("Helvetica", "B", 8)
+            pdf.set_fill_color(245, 245, 245)
+            pdf.cell(0, 6, "  25-BATCH (First Semester Second Year)", ln=True, fill=True, border=1)
+            
+            pdf.ln(2)
+            
+            # ===== FEE TABLE =====
+                        # ===== FEE TABLE =====
+            
+            # Table Header
+            pdf.set_font("Helvetica", "B", 8)
+            pdf.set_fill_color(230, 230, 230)
+            pdf.cell(90, 6, "Detail of Fees", border=1, fill=True, align='C')
+            pdf.cell(45, 6, "Amount", border=1, fill=True, align='C', ln=True)
+            
+            # Fee Row - Left side (multi-line description)
+            start_y = pdf.get_y()
+            
+            # Left cell border (tall)
+            pdf.rect(10, start_y, 90, 18)
+            
+            # Left cell text
+            pdf.set_font("Helvetica", "", 7)
+            pdf.set_xy(12, start_y + 2)
+            pdf.cell(86, 4, "First Semester Second Year")
+            pdf.set_xy(12, start_y + 6)
+            pdf.cell(86, 4, "admission fees")
+            pdf.set_xy(12, start_y + 10)
+            pdf.cell(86, 4, "(All inclusive) 25-Batch")
+            
+            # Right cell border + amount
+            pdf.rect(100, start_y, 45, 18)
+            pdf.set_font("Helvetica", "", 9)
+            pdf.set_xy(100, start_y + 6)
+            pdf.cell(45, 6, str(final_amount).replace("Rs. ", ""), align='R')
+            
+            # Move to after table
+            pdf.set_y(start_y + 18)
+            
+            # G.TOTAL row
+            pdf.set_font("Helvetica", "B", 8)
+            pdf.set_fill_color(240, 240, 240)
+            pdf.cell(90, 7, "  G.TOTAL", border=1, align='L', fill=True)
+            pdf.cell(45, 7, str(final_amount), border=1, align='R', fill=True, ln=True)
+            pdf.ln(3)
+            
+            # ===== AMOUNT IN WORDS =====
+            pdf.set_font("Helvetica", "I", 7)
+            pdf.cell(0, 4, "Fifty Three Thousand Four Hundred only", ln=True)
+            
+            pdf.ln(6)
+            
+            # ===== SIGNATURE AREA =====
+                        
+                        
+            pdf.ln(8)
+            pdf.set_font("Helvetica", "B", 8)
+            
+            # CASHIER on left
+            pdf.set_x(10)
+            pdf.cell(60, 5, "CASHIER", align='L')
+            
+            # OFFICER on far right (page edge)
+            pdf.set_x(90)
+            pdf.cell(48, 5, "OFFICER", align='R', ln=True)
+            
+            # ===== FOOTER (Receipt ID + Timestamp) =====
+            pdf.ln(5)
+            pdf.set_draw_color(100, 100, 100)
+            pdf.line(10, pdf.get_y(), 138, pdf.get_y())
+            pdf.ln(2)
+            pdf.set_font("Helvetica", "", 6)
+            pdf.set_text_color(100, 100, 100)
+            pdf.cell(0, 3, f"Receipt ID: {full_receipt_id}", ln=True, align='C')
+            pdf.cell(0, 3, f"Generated: {receipt_data['generated_on']}", ln=True, align='C')
+            
+            # ===== OUTPUT PDF =====
+            pdf_bytes = bytes(pdf.output())
+            
             st.download_button(
-                label="Download Receipt",
-                data=receipt_text,
-                file_name=f"receipt_{receipt_id}.txt",
-                mime="text/plain",
+                label="📥 Download PDF Receipt",
+                data=pdf_bytes,
+                file_name=f"receipt_{receipt_id}.pdf",
+                mime="application/pdf",
                 use_container_width=True
             )
-
 # ===== FOOTER =====
 st.markdown("""
 <div class="app-footer">
